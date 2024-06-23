@@ -10,9 +10,20 @@ const client = new MongoClient(mongoUri);
 const database = client.db(config.mongodb.database);
 const petsCollection = database.collection('petsCollection');
 const statisticsCollection = database.collection('statisticsCollection');
+const usersCollection = database.collection('users');
 
 mqttClient.on("connect", () => {
     mqttClient.subscribe("sensor", (err) => {
+        if (!err) {
+            console.log("MQTT Client connected");
+        }
+    });
+    mqttClient.subscribe("request", (err) => {
+        if (!err) {
+            console.log("MQTT Client connected");
+        }
+    });
+    mqttClient.subscribe("login", (err) => {
         if (!err) {
             console.log("MQTT Client connected");
         }
@@ -22,7 +33,25 @@ mqttClient.on("connect", () => {
 mqttClient.on("message", async (topic, message) => {
     try {
         const data = JSON.parse(message.toString());
-        await saveData(data); // Guardar los datos en la base de datos
+        if (topic === "sensor") {
+            await saveData(data);
+        } else if (topic === "request") {
+            if (data.type === "pets") {
+                const petsData = await petsCollection.find().toArray();
+                mqttClient.publish("petsResponse", JSON.stringify(petsData));
+            } else if (data.type === "statistics") {
+                const statisticsData = await statisticsCollection.find().toArray();
+                mqttClient.publish("statsResponse", JSON.stringify(statisticsData));
+            }
+        }
+        if (topic === "login") {
+            const user = await usersCollection.findOne({ username: data.username });
+            if (user && user.password === data.password) {
+                mqttClient.publish("loginResponse", JSON.stringify({ success: true }));
+            } else {
+                mqttClient.publish("loginResponse", JSON.stringify({ success: false }));
+            }
+        }
     } catch (err) {
         console.error(`Error: ${err}`);
     }

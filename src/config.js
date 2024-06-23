@@ -4,7 +4,8 @@ config.debug = process.env.DEBUG || true;
 
 config.mqtt  = {};
 config.mqtt.namespace = process.env.MQTT_NAMESPACE || '#'; //Se refiere a que temas te vas a querer suscribir
-config.mqtt.hostname  = process.env.MQTT_HOSTNAME  || '35.175.137.235' ;//Aca se especifica el ip del broker, en mi caso es de AWS MyServidor
+//acá va la IP privada del servidor AWS de MQTT
+config.mqtt.hostname  = process.env.MQTT_HOSTNAME  || '172.31.31.191' ;//Aca se especifica el ip del broker, en mi caso es de AWS MyServidor
 config.mqtt.port      = process.env.MQTT_PORT      || 1883; //Puerto por defecto del broker
 
 config.mongodb = {};
