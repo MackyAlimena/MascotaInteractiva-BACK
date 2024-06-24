@@ -1,6 +1,9 @@
 const mqtt = require("mqtt");
 const { MongoClient } = require("mongodb");
 const config = require("./config");
+const crypto = require('crypto');
+const algorithm = 'aes-256-ctr';
+const secretKey = 'vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3'; // replace with your own secret key
 
 const mqttUri = `mqtt://${config.mqtt.hostname}:${config.mqtt.port}`;
 const mqttClient = mqtt.connect(mqttUri);
@@ -30,6 +33,12 @@ mqttClient.on("connect", () => {
     });
 });
 
+function decrypt(hash) {
+    const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(hash.iv, 'hex'));
+    const decrpyted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
+    return decrpyted.toString();
+}
+
 mqttClient.on("message", async (topic, message) => {
     console.log(`Received message on topic ${topic}`);
     try {
@@ -54,12 +63,14 @@ mqttClient.on("message", async (topic, message) => {
         }
         if (topic === "login") {
             console.log("Processing login");
-            const user = await usersCollection.findOne({ username: data.username });
-            if (user && user.password === data.password) {
-                console.log("Login successful");
+            const decrypted = decrypt(data);
+            const [username, password] = decrypted.split(':');
+            const user = await usersCollection.findOne({ username: username });
+            if (user && user.password === password) {
+                console.log("Login Succesful");
                 mqttClient.publish("loginResponse", JSON.stringify({ success: true }));
             } else {
-                console.log("Login failed");
+                console.log("Login Failed");
                 mqttClient.publish("loginResponse", JSON.stringify({ success: false }));
             }
         }
