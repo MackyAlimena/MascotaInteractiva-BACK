@@ -64,10 +64,12 @@ mqttClient.on("message", async (topic, message) => {
         if (topic === "login") {
             console.log("Processing login");
             const decrypted = decrypt(data);
+            console.log("Decrypted data: ", decrypted);
             const [username, password] = decrypted.split(':');
             const user = await usersCollection.findOne({ username: username });
+            console.log("User from database: ", user);
             if (user && user.password === password) {
-                console.log("Login Succesful");
+                console.log("Login Successful");
                 mqttClient.publish("loginResponse", JSON.stringify({ success: true }));
             } else {
                 console.log("Login Failed");
