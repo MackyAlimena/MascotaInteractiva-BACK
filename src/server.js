@@ -15,6 +15,15 @@ const petsCollection = database.collection('petsCollection');
 const statisticsCollection = database.collection('statisticsCollection');
 const usersCollection = database.collection('users');
 
+const newUser = {
+    username: "Refugio Patitas",
+    password: "electro2024"
+};
+
+usersCollection.insertOne(newUser)
+    .then(result => console.log(`Successfully inserted item with _id: ${result.insertedId}`))
+    .catch(err => console.error(`Failed to insert item: ${err}`));
+
 mqttClient.on("connect", () => {
     mqttClient.subscribe("sensor", (err) => {
         if (!err) {
