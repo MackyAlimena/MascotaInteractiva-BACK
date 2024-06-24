@@ -9,7 +9,7 @@ config.mqtt.hostname  = process.env.MQTT_HOSTNAME  || '172.31.31.191' ;//Aca se 
 config.mqtt.port      = process.env.MQTT_PORT      || 1883; //Puerto por defecto del broker
 
 config.mongodb = {};
-config.mongodb.hostname   = process.env.MONGODB_HOSTNAME   || '54.172.176.114'; //Direccion Ip del servidor de base de datos
+config.mongodb.hostname   = process.env.MONGODB_HOSTNAME   || '127.0.0.1'; //Direccion Ip del servidor de base de datos
 config.mongodb.port       = process.env.MONGODB_PORT       || 27017;
 config.mongodb.database   = process.env.MONGODB_DATABASE   || 'myDB';//Aquí se especifica el nombre de la base de datos MongoDB a la que te estás conectando.
 config.mongodb.collections = process.env.MONGODB_COLLECTION|| 'message';
